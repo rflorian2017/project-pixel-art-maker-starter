@@ -3,50 +3,44 @@
 
 // When size is submitted by the user, call makeGrid()
 
-var doc = this.document;
-var formSubmit = doc.getElementById('sizePicker');
-var pixelCanvas = doc.getElementById('pixel_canvas');
-var canvas = doc.createElement('canvas');
-var ctx = canvas.getContext('2d');
-var height = undefined;
-var width = undefined;
+const doc = this.document;
+const formSubmit = doc.getElementById('sizePicker');
+const pixelCanvas = doc.getElementById('pixel_canvas');
 
+//add listener for the submit event
 formSubmit.addEventListener('submit', function(event){
+	//prevent from refreshing the page
 	event.preventDefault();
-	makeGrid();
-	//return false;
+	makeGrid(); //call the event function
 });
 
-canvas.addEventListener('click', function(ev) {
-	var rect = canvas.getBoundingClientRect();
-	var positionX = Math.floor((event.clientX - rect.left)/15);
-	var positionY = Math.floor((event.clientY - rect.top)/15);
+function changeColor(cell) {
+	//select the color, directly in the event function
 	var color = doc.getElementById('colorPicker').value;
-	
-	ctx.fillStyle = color;
-	ctx.fillRect(positionX * 15, positionY * 15,15,15);
-	
-});
-
-function makeGrid() {
-	if((height !== undefined) && (width !== undefined)) {
-		ctx.clearRect(0,0,width,height + 6);
-	}
-	
-	height = doc.getElementById('input_height').value;
-	width = doc.getElementById('input_width').value;
-	
-	canvas.width = width * 15;
-    canvas.height = height * 15;
-	var row = pixelCanvas.insertRow(0);
-	var cell = row.insertCell(0);
-	cell.appendChild(canvas);
-	
-	for(var i = 0; i< width ; i++ )
-		for(var j = 0; j< height; j++)
-		{
-			ctx.strokeRect(i*15, j* 15 , 15, 15);
-		}
+	cell.bgColor = color; //change the background color
 }
 
-//makeGrid();
+function makeGrid() {
+	//reset the table
+	pixelCanvas.innerHTML = '';
+	
+	//read the height and the width
+	var height = doc.getElementById('input_height').value;
+	var width = doc.getElementById('input_width').value;
+	
+	//loop throughout the cells
+	for(var i = 0; i< height ; i++ )
+	{
+		//insert a row in the position defined by i
+		var row = pixelCanvas.insertRow(i);
+		for(var j = 0; j< width; j++)
+		{
+			//insert a cell, in the position defined by j
+			var cell = row.insertCell(j);
+			//add event listener for clicking on a cell
+			cell.onclick = function() {
+				changeColor(this);
+			};
+		}
+	}
+}
